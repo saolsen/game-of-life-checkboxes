@@ -1,0 +1,23 @@
+name: build and publish website
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_publish_website:
+    name: build and publish website
+    runs-on: ubuntu-latest
+    steps:
+      - name: set up emscripten
+        uses: lovasoa/setup-emscripten@master
+        with:
+          emscripten-version: '2.0.31'
+      - name: build
+        run: ./build.sh
+        working-directory: web
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web/build
