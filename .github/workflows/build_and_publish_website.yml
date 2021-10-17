@@ -9,10 +9,10 @@ jobs:
     name: build and publish website
     runs-on: ubuntu-latest
     steps:
-    - name: setup emsdk
-      uses: mymindstorm/setup-emsdk@v9
-      with:
-        version: 2.0.31
+      - name: setup emsdk
+        uses: mymindstorm/setup-emsdk@v9
+        with:
+          version: 2.0.31
       - name: build
         run: ./build.sh
         working-directory: web
