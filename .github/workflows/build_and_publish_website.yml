@@ -13,8 +13,9 @@ jobs:
         uses: mymindstorm/setup-emsdk@v9
         with:
           version: 2.0.3
+      - uses: actions/checkout@v2
       - name: build
-        run: ls
+        run: ./build.sh
         working-directory: ./web
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
