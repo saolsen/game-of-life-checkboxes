@@ -1,2 +1,6 @@
 vs2019/x64/*
 web/build/*
+.vscode/*
+vs2019/plant-game.vcxproj.filters
+vs2019/plant-game.vcxproj.user
+vs2019/.vs/*
