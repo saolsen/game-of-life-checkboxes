@@ -15,7 +15,7 @@ jobs:
           version: 2.0.3
       - name: build
         run: bash build.sh
-        working-directory: web
+        working-directory: ./web
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
