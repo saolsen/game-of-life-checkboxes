@@ -14,6 +14,8 @@
 #include "sokol_glue.h"
 // #include "imgui_font.h"
 #define SOKOL_IMGUI_IMPL
+#include <string.h>
+
 #include "sokol_imgui.h"
 
 static bool show_test_window = true;
@@ -25,7 +27,8 @@ static sg_pass_action pass_action;
 
 #define NUM_CELLS 32
 
-static int cells[NUM_CELLS][NUM_CELLS];
+static bool last_frame[NUM_CELLS][NUM_CELLS];
+static bool cells[NUM_CELLS][NUM_CELLS];
 
 void init(void) {
   // setup sokol-gfx and sokol-time
@@ -69,6 +72,7 @@ void init(void) {
   pass_action.colors[0].action = SG_ACTION_CLEAR;
   pass_action.colors[0].value = {0.3f, 0.7f, 0.0f, 1.0f};
 
+  // set all to 0
   for (int y = 0; y < NUM_CELLS; y++) {
     for (int x = 0; x < NUM_CELLS; x++) {
       cells[y][x] = x > 0 && y > 0 && x / y == 0;
@@ -82,7 +86,48 @@ int x_offset = 300;
 int y_offset = 50;
 int cell_size = 10;
 
+bool running = false;
+
 void frame(void) {
+  memcpy(last_frame, cells, sizeof(bool) * NUM_CELLS * NUM_CELLS);
+
+  if (running && x % 10 == 0) {
+    // game of life
+    for (int y = 0; y < NUM_CELLS; y++) {
+      for (int x = 0; x < NUM_CELLS; x++) {
+        bool alive = last_frame[y][x];
+        int n = 0;
+        // loop over neighboring cells,
+        for (int i = y - 1; i <= y + 1; i++) {
+          for (int j = x - 1; j <= x + 1; j++) {
+            // Don't check self
+            if (i == y && j == x) continue;
+            // Watch out for the border
+            if (i < 0 || i >= NUM_CELLS) continue;
+            if (j < 0 || j >= NUM_CELLS) continue;
+            if (last_frame[i][j]) {
+              n++;
+            }
+          }
+        }
+        if (alive) {
+          if (n == 2 || n == 3) {
+            // stay alive
+            cells[y][x] = true;
+          } else {
+            cells[y][x] = false;
+          }
+        } else {
+          if (n == 3) {
+            cells[y][x] = true;
+          } else {
+            cells[y][x] = false;
+          }
+        }
+      }
+    }
+  }
+
   x++;
   const int width = sapp_width();
   const int height = sapp_height();
@@ -94,7 +139,7 @@ void frame(void) {
   // draw->AddRectFilled(ImVec2(x_offset, y_offset),ImVec2(x_offset + cell_size * NUM_CELLS, y_offset + cell_size *
   // NUM_CELLS), IM_COL32_WHITE, 0.f, 0);
 
-  for (int y = 0; y < NUM_CELLS; y++) {
+  /* for (int y = 0; y < NUM_CELLS; y++) {
     for (int x = 0; x < NUM_CELLS; x++) {
       ImVec2 min =
           ImVec2((float)x * cell_size - cell_size / 2 + x_offset, (float)y * cell_size - cell_size / 2 + y_offset);
@@ -108,19 +153,32 @@ void frame(void) {
       }
       draw->AddRectFilled(min, max, color, 0.f, 0);
     }
-  }
+  } */
 
   // draw->AddRectFilled(ImVec2(p.x - 10., p.y - 10.), ImVec2(p.x + 10., p.y + 10.), IM_COL32_WHITE, 0.f, 0);
 
   ImGui::Begin("Plant Test");
   ImGui::Text("Plant Testing");
-  ImGui::Text("%i", x);
+  ImGui::Checkbox("Running", &running);
+  /* ImGui::Text("%i", x);
   ImGui::Text("Cursor At: (%f, %f)", p.x, p.y);
   ImGui::SliderInt("x_offset", &x_offset, 0, 1000);
   ImGui::SliderInt("y_offset", &y_offset, 0, 1000);
-  ImGui::SliderInt("cell_size", &cell_size, 0, 1000);
+  ImGui::SliderInt("cell_size", &cell_size, 0, 1000); */
+  ImGui::End();
 
-  // So I want like a grid or something.
+  ImGui::Begin("Plants");
+  for (int y = 0; y < NUM_CELLS; y++) {
+    for (int x = 0; x < NUM_CELLS; x++) {
+      bool *cell = &(cells[y][x]);
+      ImGui::PushID(cell);
+      ImGui::Checkbox("", cell);
+      ImGui::PopID;
+      if (x != NUM_CELLS - 1) {
+        ImGui::SameLine();
+      }
+    }
+  }
   ImGui::End();
 
   // 1. Show a simple window
