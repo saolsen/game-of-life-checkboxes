@@ -13,11 +13,12 @@ jobs:
         uses: mymindstorm/setup-emsdk@v9
         with:
           version: 2.0.3
-      - uses: actions/checkout@v2
+      - name: checkout code
+        uses: actions/checkout@v2
       - name: build
         run: ./build.sh
         working-directory: ./web
-      - name: deploy
+      - name: publish
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

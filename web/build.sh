@@ -1,9 +1,10 @@
 #!/bin/bash
 
 emcc \
+    -s USE_WEBGL2=1 \
     -Os \
     --shell-file shell.html \
-    -DSOKOL_GLES2 \
+    -DSOKOL_GLES3 \
     -I../lib \
     ../plant_game.cpp \
     ../lib/imgui.cpp \
