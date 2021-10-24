@@ -157,17 +157,18 @@ void frame(void) {
 
   // draw->AddRectFilled(ImVec2(p.x - 10., p.y - 10.), ImVec2(p.x + 10., p.y + 10.), IM_COL32_WHITE, 0.f, 0);
 
-  ImGui::Begin("Plant Test");
-  ImGui::Text("Plant Testing");
-  ImGui::Checkbox("Running", &running);
+  // ImGui::Begin("Plant Test");
+  // ImGui::Text("Plant Testing");
+  // ImGui::Checkbox("Running", &running);
   /* ImGui::Text("%i", x);
   ImGui::Text("Cursor At: (%f, %f)", p.x, p.y);
   ImGui::SliderInt("x_offset", &x_offset, 0, 1000);
   ImGui::SliderInt("y_offset", &y_offset, 0, 1000);
   ImGui::SliderInt("cell_size", &cell_size, 0, 1000); */
-  ImGui::End();
+  // ImGui::End();
 
   ImGui::Begin("Plants");
+  ImGui::Checkbox("Running", &running);
   for (int y = 0; y < NUM_CELLS; y++) {
     for (int x = 0; x < NUM_CELLS; x++) {
       bool *cell = &(cells[y][x]);
