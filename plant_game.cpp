@@ -1,11 +1,3 @@
-//------------------------------------------------------------------------------
-//  imgui-highdpi-sapp.c
-//
-//  This demonstrates Dear ImGui rendering via sokol_gfx.h and sokol_imgui.h,
-//  with HighDPI rendering and a custom embedded font.
-//------------------------------------------------------------------------------
-
-// same as sokol.c, but compiled as C++
 #define SOKOL_IMPL
 #if defined(_WIN32)
 #define SOKOL_LOG(s) OutputDebugStringA(s)
@@ -31,6 +23,10 @@ static bool html5_ask_leave_site = false;
 
 static sg_pass_action pass_action;
 
+#define NUM_CELLS 32
+
+static int cells[NUM_CELLS][NUM_CELLS];
+
 void init(void) {
   // setup sokol-gfx and sokol-time
   sg_desc desc = {};
@@ -39,7 +35,7 @@ void init(void) {
 
   // setup sokol-imgui, but provide our own font
   simgui_desc_t simgui_desc = {};
-  simgui_desc.no_default_font = true;
+  // simgui_desc.no_default_font = true;
   simgui_desc.dpi_scale = sapp_dpi_scale();
   simgui_setup(&simgui_desc);
 
@@ -72,15 +68,59 @@ void init(void) {
   // initial clear color
   pass_action.colors[0].action = SG_ACTION_CLEAR;
   pass_action.colors[0].value = {0.3f, 0.7f, 0.0f, 1.0f};
+
+  for (int y = 0; y < NUM_CELLS; y++) {
+    for (int x = 0; x < NUM_CELLS; x++) {
+      cells[y][x] = x > 0 && y > 0 && x / y == 0;
+    }
+  }
 }
 
+int x = 0;
+
+int x_offset = 300;
+int y_offset = 50;
+int cell_size = 10;
+
 void frame(void) {
+  x++;
   const int width = sapp_width();
   const int height = sapp_height();
   simgui_new_frame(width, height, 1.0 / 60.0);
 
+  ImVec2 p = ImGui::GetCursorScreenPos();
+  ImDrawList *draw = ImGui::GetBackgroundDrawList();
+
+  // draw->AddRectFilled(ImVec2(x_offset, y_offset),ImVec2(x_offset + cell_size * NUM_CELLS, y_offset + cell_size *
+  // NUM_CELLS), IM_COL32_WHITE, 0.f, 0);
+
+  for (int y = 0; y < NUM_CELLS; y++) {
+    for (int x = 0; x < NUM_CELLS; x++) {
+      ImVec2 min =
+          ImVec2((float)x * cell_size - cell_size / 2 + x_offset, (float)y * cell_size - cell_size / 2 + y_offset);
+      ImVec2 max =
+          ImVec2((float)x * cell_size + cell_size / 2 + x_offset, (float)y * cell_size + cell_size / 2 + y_offset);
+      int color;
+      if (cells[y][x]) {
+        color = IM_COL32_WHITE;
+      } else {
+        color = IM_COL32_BLACK;
+      }
+      draw->AddRectFilled(min, max, color, 0.f, 0);
+    }
+  }
+
+  // draw->AddRectFilled(ImVec2(p.x - 10., p.y - 10.), ImVec2(p.x + 10., p.y + 10.), IM_COL32_WHITE, 0.f, 0);
+
   ImGui::Begin("Plant Test");
   ImGui::Text("Plant Testing");
+  ImGui::Text("%i", x);
+  ImGui::Text("Cursor At: (%f, %f)", p.x, p.y);
+  ImGui::SliderInt("x_offset", &x_offset, 0, 1000);
+  ImGui::SliderInt("y_offset", &y_offset, 0, 1000);
+  ImGui::SliderInt("cell_size", &cell_size, 0, 1000);
+
+  // So I want like a grid or something.
   ImGui::End();
 
   // 1. Show a simple window
@@ -178,8 +218,9 @@ sapp_desc sokol_main(int argc, char *argv[]) {
   desc.high_dpi = true;
   desc.html5_ask_leave_site = html5_ask_leave_site;
   desc.ios_keyboard_resizes_canvas = false;
-  desc.gl_force_gles2 = true;
+  desc.gl_force_gles2 = false;
   desc.window_title = "Plant Game";
+  // todo
   desc.icon.sokol_default = true;
   return desc;
 }
