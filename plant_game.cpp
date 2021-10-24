@@ -173,7 +173,7 @@ void frame(void) {
       bool *cell = &(cells[y][x]);
       ImGui::PushID(cell);
       ImGui::Checkbox("", cell);
-      ImGui::PopID;
+      ImGui::PopID();
       if (x != NUM_CELLS - 1) {
         ImGui::SameLine();
       }
